@@ -1,0 +1,1 @@
+INSERT INTO groups (name, number, faculty_name) VALUES ('IVT', 12, 'FIT'), ('PE', 21, 'FIT');
