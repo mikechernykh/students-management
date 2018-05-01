@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Table(name = "students")
 public class Student {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private long id;
     @Column(name = "f_name")
     private String firstName;
@@ -24,8 +24,4 @@ public class Student {
     @ManyToOne
     @JoinColumn(name = "group_id")
     private Group group;
-
-    public String lastNameInitials() {
-        return lastName + " " + firstName.charAt(0) + ".";
-    }
 }

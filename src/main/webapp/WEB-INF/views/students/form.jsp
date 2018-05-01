@@ -38,7 +38,7 @@
         </form:label>
         <form:select class="form-control" path="groupName">
             <form:option value="">--- Select group ---</form:option>
-            <form:options items="${groupList}"/>
+            <form:options items="${groupNames}"/>
         </form:select>
         <form:errors path="groupName" cssClass="text-danger"/>
     </div>

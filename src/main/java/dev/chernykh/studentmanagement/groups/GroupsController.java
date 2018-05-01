@@ -1,9 +1,6 @@
 package dev.chernykh.studentmanagement.groups;
 
-import dev.chernykh.studentmanagement.errors.EntityNotFoundException;
-import dev.chernykh.studentmanagement.students.StudentRepository;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -12,7 +9,6 @@ import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.view.RedirectView;
 
 import javax.validation.Valid;
 
@@ -21,22 +17,20 @@ import javax.validation.Valid;
  */
 @AllArgsConstructor
 @Controller
-@Slf4j
 @RequestMapping("/groups")
 public class GroupsController {
-    private final GroupRepository groupRepository;
-    private final StudentRepository studentRepository;
+    private GroupService groupService;
 
     /**
      * Displaying a list of groups with pagination.
      *
      * @param pageable a page implementation instance provided by spring
-     * @param model    a model to display on a view
      * @return model and view name
      */
     @GetMapping
-    public ModelAndView groupList(@PageableDefault Pageable pageable, ModelMap model) {
-        model.addAttribute(groupRepository.findAll(pageable));
+    public ModelAndView getGroups(@PageableDefault Pageable pageable) {
+        ModelMap model = new ModelMap();
+        model.addAttribute(groupService.getAll(pageable));
         return new ModelAndView("groups/list", model);
     }
 
@@ -45,7 +39,7 @@ public class GroupsController {
      *
      * @return model and view name
      */
-    @GetMapping("/create")
+    @GetMapping("create")
     public ModelAndView createGroupForm() {
         ModelMap model = new ModelMap();
         model.addAttribute(new GroupDto());
@@ -53,119 +47,76 @@ public class GroupsController {
     }
 
     /**
-     * Verifying user-provided data.
-     * If data is valid then redirect the user to page displaying the list of groups.
-     * Otherwise display the form again.
+     * Validate and save a group.
      *
-     * @param groupDto a user-provided data
-     * @param result   verification errors if exist
+     * @param groupDto dto object to be validate and converted to student
+     * @param result   validation errors if exist
      * @return model and view name
      */
-    @PostMapping("/create")
-    public ModelAndView checkGroupAndSave(@Valid @ModelAttribute GroupDto groupDto, BindingResult result) {
+    @PostMapping("create")
+    public ModelAndView createGroup(@Valid @ModelAttribute GroupDto groupDto, BindingResult result) {
         if (result.hasErrors()) {
             return new ModelAndView("groups/create", HttpStatus.BAD_REQUEST);
         }
-
-        Group group = new Group();
-        group.setName(groupDto.getName());
-        group.setFacultyName(groupDto.getFacultyName());
-
-        groupRepository.save(group);
-
+        groupService.create(groupDto);
         return new ModelAndView("redirect:/groups");
     }
 
     /**
      * Displaying details of a group with given id.
      *
-     * @param group group entity if exists
-     * @return model and view name
-     * @throws EntityNotFoundException if entity has not been found
+     * @param id group id
+     * @return model and view
      */
-    @GetMapping("{group:\\d+}")
-    public ModelAndView viewGroup(@PathVariable Group group) throws EntityNotFoundException {
-        if (group == null) {
-            log.error("GROUPS CONTROLLER viewGroup(): group not found");
-            throw new EntityNotFoundException("error.group.notFound");
-        }
+    @GetMapping("{id}")
+    public ModelAndView viewGroup(@PathVariable long id) {
+        Group group = groupService.getOne(id);
         ModelMap model = new ModelMap();
         model.addAttribute(group);
-        model.addAttribute(studentRepository.findByGroup(group));
         return new ModelAndView("groups/viewOne", model);
     }
 
     /**
-     * Deleting a group with given id if one exists.
+     * Deleting a group with given id.
      *
-     * @param group an entity to be deleted
-     * @return redirect view name
-     * @throws EntityNotFoundException if a group has not been found
+     * @param id group id
+     * @return model and view
      */
-    @GetMapping("/{group:\\d+}/delete")
-    public RedirectView deleteGroup(@PathVariable Group group) throws EntityNotFoundException {
-        if (group == null) {
-            log.error("GROUPS CONTROLLER deleteGroup(): group not found");
-            throw new EntityNotFoundException("error.group.notFound");
-        }
-        groupRepository.delete(group);
-        return new RedirectView("/groups");
+    @GetMapping("{id}/delete")
+    public ModelAndView deleteGroup(@PathVariable long id) {
+        groupService.delete(id);
+        return new ModelAndView("redirect:/groups");
     }
 
     /**
-     * Displaying a form to edit a given group.
+     * Displaying a form to edit a group with a given id.
      *
-     * @param group an entity to be edited
+     * @param id group id
      * @return model and view
-     * @throws EntityNotFoundException if a group has not been found
      */
-    @GetMapping("/{group:\\d+}/edit")
-    public ModelAndView showEditGroupForm(@PathVariable Group group) throws EntityNotFoundException {
-        if (group == null) {
-            log.error("GROUPS CONTROLLER showEditGroupForm(): group not found");
-            throw new EntityNotFoundException("error.group.notFound");
-        }
-        GroupDto groupDto = new GroupDto();
-        groupDto.setId(group.getId());
-        groupDto.setName(group.getName());
-        groupDto.setFacultyName(group.getFacultyName());
-
+    @GetMapping("{id}/edit")
+    public ModelAndView editGroupForm(@PathVariable long id) {
+        Group group = groupService.getOne(id);
         ModelMap model = new ModelMap();
         model.addAttribute(group);
-        model.addAttribute(groupDto);
+        model.addAttribute(new GroupDto(group));
         return new ModelAndView("groups/edit", model);
     }
 
     /**
-     * Checking that the group with given id exist and save it.
-     * Otherwise throw the exception if one does not exist.
+     * Update the group with given id.
      *
      * @param groupDto the changed group
-     * @param result   verification errors if exist
-     * @param group    an entity fetched by id from DB if one exists
+     * @param result   validation errors if exist
      * @return model and view name
-     * @throws EntityNotFoundException if a group has not been found
      */
-    @PostMapping("/{group:\\d+}/edit")
-    public ModelAndView saveChangedGroupIfValid(@Valid @ModelAttribute GroupDto groupDto, BindingResult result, @PathVariable Group group)
-            throws EntityNotFoundException {
-        if (group == null) {
-            log.error("GROUPS CONTROLLER saveChangedGroupIfValid(): group not found");
-            throw new EntityNotFoundException("error.group.notFound");
-        }
+    @PostMapping("{id}/edit")
+    public ModelAndView editGroup(@Valid @ModelAttribute GroupDto groupDto, BindingResult result) {
 
         if (result.hasErrors()) {
-            groupDto.setId(group.getId());
-            ModelMap model = new ModelMap();
-            model.addAttribute(groupDto);
-            model.addAttribute(group);
-            return new ModelAndView("groups/edit", model, HttpStatus.BAD_REQUEST);
+            return new ModelAndView("groups/edit", HttpStatus.BAD_REQUEST);
         }
-
-        group.setName(groupDto.getName());
-        group.setFacultyName(groupDto.getFacultyName());
-        groupRepository.save(group);
-
-        return new ModelAndView("redirect:/groups/" + group.getId());
+        groupService.update(groupDto);
+        return new ModelAndView("redirect:/groups/" + groupDto.getId());
     }
 }

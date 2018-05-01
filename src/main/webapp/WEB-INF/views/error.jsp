@@ -17,10 +17,12 @@
 </head>
 <body>
 <%@ include file="portion/header.jsp" %>
-<div class="container text-center">
-    <p class="code-404 text-danger font-weight-bold">404</p>
-    <p class="mt-3 text-primary"><spring:message code="${message}"/></p>
-    <a href="/" class="btn btn-danger"><spring:message code="error.btnHome"/></a>
+<div class="container">
+    <div>
+        <h3><spring:message code="errorPage.title"/></h3>
+    </div>
+    <h1 class="h1 text-danger">${status}</h1>
+    <p class="text-primary">${message}</p>
 </div>
 
 <%@ include file="portion/footer.jsp" %>

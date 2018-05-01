@@ -21,21 +21,7 @@
 <body>
 <%@ include file="../portion/header.jsp" %>
 <div class="container">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-                <a href="/groups">
-                    <spring:message code="breadcrumb.students"/>
-                </a>
-            </li>
-            <li class="breadcrumb-item">
-                <a href="/students/${student.id}">${student.lastNameInitials()}</a>
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">
-                <spring:message code="breadcrumb.students.edit"/>
-            </li>
-        </ol>
-    </nav>
+
     <h3 class="h3">
         <spring:message code="editStudentPage.title"/>
     </h3>

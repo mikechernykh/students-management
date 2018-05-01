@@ -20,13 +20,7 @@
 <body>
 <%@ include file="../portion/header.jsp" %>
 <div class="container">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item active" aria-current="page">
-                <spring:message code="breadcrumb.students"/>
-            </li>
-        </ol>
-    </nav>
+
     <div class="mt-3 mb-3">
         <a href="/students/create" class="btn btn-primary">
             <spring:message code="studentsPage.addLink"/>

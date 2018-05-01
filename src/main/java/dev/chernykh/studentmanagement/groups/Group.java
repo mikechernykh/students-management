@@ -13,7 +13,7 @@ import javax.persistence.*;
 @Table(name = "groups", uniqueConstraints = @UniqueConstraint(columnNames = {"name"}))
 public class Group {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private long id;
     @Column(name = "name")
     private String name;

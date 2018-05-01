@@ -21,22 +21,10 @@
 <body>
 <%@ include file="../portion/header.jsp" %>
 <div class="container">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-                <a href="/groups">
-                    <spring:message code="breadcrumb.groups"/>
-                </a>
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">
-                <spring:message code="breadcrumb.groups.add"/>
-            </li>
-        </ol>
-    </nav>
+
     <h3 class="h3">
         <spring:message code="createGroupPage.title"/>
     </h3>
-
     <jsp:include page="form.jsp"/>
 
 </div>

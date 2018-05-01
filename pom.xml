@@ -8,7 +8,6 @@
     <version>1.0</version>
     <packaging>jar</packaging>
 
-    <name>student-management</name>
     <description>The simple student management system app</description>
 
     <parent>

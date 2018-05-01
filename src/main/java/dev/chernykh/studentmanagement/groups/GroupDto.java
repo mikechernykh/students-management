@@ -16,5 +16,17 @@ public class GroupDto {
     @NotBlank(message = "NotBlank.groupDto.facultyName")
     private String facultyName;
 
+    GroupDto(Group group) {
+        this.id = group.getId();
+        this.name = group.getName();
+        this.facultyName = group.getFacultyName();
+    }
 
+    public Group toGroup() {
+        Group group = new Group();
+        group.setId(id);
+        group.setName(name);
+        group.setFacultyName(facultyName);
+        return group;
+    }
 }

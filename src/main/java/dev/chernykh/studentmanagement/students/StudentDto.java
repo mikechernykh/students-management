@@ -20,7 +20,7 @@ public class StudentDto {
     @NotNull(message = "NotNull.studentDto.dateOfBirth")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateOfBirth;
-    @NotBlank(message = "NotBlank.studentDto.group")
+    @NotBlank(message = "NotBlank.studentDto.groupName")
     private String groupName;
 
     public StudentDto(Student student) {

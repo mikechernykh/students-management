@@ -12,4 +12,6 @@ public interface GroupRepository extends PagingAndSortingRepository<Group, Long>
     List<String> findNames();
 
     Group findByNameLike(String name);
+
+    boolean existsByNameLike(String name);
 }
